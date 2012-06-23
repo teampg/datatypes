@@ -1,9 +1,11 @@
-package teampg199.datatypes.grid2d.chunkgrid;
+package teampg.grid2d.chunkgrid;
+
 
 import java.awt.Dimension;
 
-import teampg199.datatypes.grid2d.point.BoundedPos;
-import teampg199.datatypes.grid2d.point.Pos2D;
+import teampg.grid2d.point.BoundedPos;
+import teampg.grid2d.point.Pos2D;
+
 
 /**
  * The position of a specific Cell in a specific Chunk on some {@link ChunkedGrid}.

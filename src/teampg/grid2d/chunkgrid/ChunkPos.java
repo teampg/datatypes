@@ -1,6 +1,6 @@
-package teampg199.datatypes.grid2d.chunkgrid;
+package teampg.grid2d.chunkgrid;
 
-import teampg199.datatypes.grid2d.point.Pos2D;
+import teampg.grid2d.point.Pos2D;
 
 public class ChunkPos extends Pos2D {
 	private ChunkPos(int x, int y) {

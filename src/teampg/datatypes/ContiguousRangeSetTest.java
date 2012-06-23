@@ -1,4 +1,4 @@
-package teampg199.datatypes.datatypes;
+package teampg.datatypes;
 
 import static org.junit.Assert.*;
 

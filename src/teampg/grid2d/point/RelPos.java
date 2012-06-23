@@ -1,4 +1,4 @@
-package teampg199.datatypes.grid2d.point;
+package teampg.grid2d.point;
 
 public final class RelPos extends Pos2D {
 	public static final RelPos ZERO       = new RelPos( 0,  0);

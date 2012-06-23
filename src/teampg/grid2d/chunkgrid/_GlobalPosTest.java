@@ -1,12 +1,14 @@
-package teampg199.datatypes.grid2d.chunkgrid;
+package teampg.grid2d.chunkgrid;
 
 import static org.junit.Assert.*;
+
 
 import java.awt.Dimension;
 
 import org.junit.Test;
 
-import teampg199.datatypes.grid2d.point.BoundedPos;
+import teampg.grid2d.point.BoundedPos;
+
 
 public class _GlobalPosTest {
 

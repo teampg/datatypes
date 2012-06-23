@@ -1,6 +1,7 @@
-package teampg199.datatypes.grid2d.chunkgrid;
+package teampg.grid2d.chunkgrid;
 
 import static org.junit.Assert.*;
+
 
 import java.awt.Dimension;
 import java.util.Arrays;
@@ -8,7 +9,8 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
-import teampg199.datatypes.grid2d.point.BoundedPos;
+import teampg.grid2d.point.BoundedPos;
+
 
 public class _SimpleChunkTest {
 	private static final Dimension CHUNK_SIZE = new Dimension(3, 3);

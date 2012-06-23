@@ -1,12 +1,14 @@
-package teampg199.datatypes.grid2d;
+package teampg.grid2d;
 
 import static com.google.common.base.Preconditions.checkArgument;
+
 
 import java.awt.Dimension;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import teampg199.datatypes.grid2d.point.BoundedPos;
+import teampg.grid2d.point.BoundedPos;
+
 
 
 import com.google.common.collect.Iterators;

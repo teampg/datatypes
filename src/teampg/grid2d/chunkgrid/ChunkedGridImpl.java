@@ -1,6 +1,7 @@
-package teampg199.datatypes.grid2d.chunkgrid;
+package teampg.grid2d.chunkgrid;
 
 import static com.google.common.base.Preconditions.checkArgument;
+
 
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -9,10 +10,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import teampg.grid2d.point.BoundedPos;
+import teampg.grid2d.point.Pos2D;
+
 import com.google.common.collect.ImmutableSet;
 
-import teampg199.datatypes.grid2d.point.BoundedPos;
-import teampg199.datatypes.grid2d.point.Pos2D;
 
 public class ChunkedGridImpl<T> implements ChunkedGrid<T> {
 	private final Dimension chunkSize;

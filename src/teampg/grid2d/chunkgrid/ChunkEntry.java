@@ -1,4 +1,4 @@
-package teampg199.datatypes.grid2d.chunkgrid;
+package teampg.grid2d.chunkgrid;
 
 public class ChunkEntry<E> {
 	private final ChunkPos pos;

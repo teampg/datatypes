@@ -1,9 +1,11 @@
-package teampg199.datatypes.grid2d;
+package teampg.grid2d;
+
 
 import java.awt.Dimension;
 
-import teampg199.datatypes.grid2d.point.BoundedPos;
-import teampg199.datatypes.grid2d.point.Pos2D;
+import teampg.grid2d.point.BoundedPos;
+import teampg.grid2d.point.Pos2D;
+
 
 public interface GridInterface<T> extends Iterable<T> {
 	T get(BoundedPos at);

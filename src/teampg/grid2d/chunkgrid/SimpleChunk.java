@@ -1,7 +1,9 @@
-package teampg199.datatypes.grid2d.chunkgrid;
+package teampg.grid2d.chunkgrid;
+
 
 import java.awt.Dimension;
-import teampg199.datatypes.grid2d.RectGrid;
+
+import teampg.grid2d.RectGrid;
 
 public class SimpleChunk<T> extends RectGrid<T> implements Chunk<T> {
 	public SimpleChunk(Dimension size) {

@@ -1,4 +1,4 @@
-package teampg199.datatypes.grid2d.point;
+package teampg.grid2d.point;
 
 import static com.google.common.base.Preconditions.checkArgument;
 

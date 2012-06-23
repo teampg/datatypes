@@ -1,4 +1,4 @@
-package teampg199.datatypes.grid2d.point;
+package teampg.grid2d.point;
 
 import java.awt.Dimension;
 import java.util.Collection;
