@@ -28,4 +28,8 @@ public final class RelPos extends Pos2D {
 	public static RelPos of(int x, int y) {
 		return new RelPos(x, y);
 	}
+
+	public static <T extends Pos2D> RelPos offsetVector(T origin, T offset) {
+		return Pos2D.shiftCenterPosition(new RelPos(origin.x, origin.y), new RelPos(offset.x, offset.y));
+	}
 }

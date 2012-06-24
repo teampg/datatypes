@@ -31,10 +31,10 @@ public class BoundedPos extends Pos2D {
 		return (T) ret;
 	}
 
-	public static BoundedPos of(int x, int y, Dimension chunkSize) {
+	public static BoundedPos of(int x, int y, Dimension chunkSize) throws PosOutOfBoundsException {
 		BoundedPos ret = new BoundedPos(x, y, chunkSize);
-		if (ret.isValid() == false) {
-			return null;
+		if (!ret.isValid()) {
+			throw new PosOutOfBoundsException(ret.bounds, ret);
 		}
 
 		return ret;
@@ -42,5 +42,25 @@ public class BoundedPos extends Pos2D {
 
 	private boolean isValid() {
 		return Pos2D.isWithinDimensions(this, bounds);
+	}
+
+	public static class PosOutOfBoundsException extends Error {
+		private static final long serialVersionUID = 1L;
+
+		private final Dimension bounds;
+		private final Pos2D pos;
+
+		public PosOutOfBoundsException(Dimension bounds, Pos2D pos) {
+			this.bounds = bounds;
+			this.pos = pos;
+		}
+
+		public Dimension getBounds() {
+			return bounds;
+		}
+
+		public Pos2D getPos() {
+			return pos;
+		}
 	}
 }
