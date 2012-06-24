@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.google.common.base.Objects;
 import com.google.common.collect.Range;
 
 /**
@@ -34,13 +33,7 @@ import com.google.common.collect.Range;
  */
 public class ContiguousRangeSet<D extends Comparable<D>, T> {
 	public enum Side {
-		RIGHT(1), LEFT(-1);
-
-		private final int index;
-
-		Side(int index) {
-			this.index = index;
-		}
+		RIGHT, LEFT;
 	};
 
 	private final Range<D> totalBounds;
@@ -103,14 +96,22 @@ public class ContiguousRangeSet<D extends Comparable<D>, T> {
 
 	public void setPartitionType(int index, Side boundToSetClosed) {
 		checkElementIndex(index, partitions.size(), "Partition index out of bounds");
-		partitions.get(index).closedSide = boundToSetClosed;
+
+		RangePartition<D> toReplace = partitions.get(index);
+		if (boundToSetClosed == toReplace.getClosedSide()) {
+			return;
+		}
+
+		RangePartition<D> changedBound = RangePartition.of(toReplace.getPosition(), boundToSetClosed);
+		partitions.add(index, changedBound);
+		partitions.remove(index + 1);
 	}
 
 	// ==================
 
-	public void addPartition(D splitPoint, Side toClose, T fillForNewRange, Side toOverwrite) {
-		checkArgument(totalBounds.contains(splitPoint), "Split point out of bounds " + totalBounds);
-		checkArgument(!partitions.contains(new RangePartition<D>(splitPoint, null)));
+	public void addPartition(RangePartition<D> toAdd, T fillForNewRange, Side toOverwrite) {
+		checkArgument(totalBounds.contains(toAdd.getPosition()), "Split point out of bounds " + totalBounds);
+		checkArgument(!partitions.contains(toAdd));
 
 		/*
 		 * FIXME throws error when you try to add partition at same pos as
@@ -118,12 +119,12 @@ public class ContiguousRangeSet<D extends Comparable<D>, T> {
 		 * this when implementing gui component
 		 */
 
-		int valueRangeToShrink = indexOfRangeOwningPosition(splitPoint);
+		int valueRangeToShrink = indexOfRangeOwningPosition(toAdd.getPosition());
 		int valuesInsertionPoint = valueRangeToShrink + (toOverwrite == Side.RIGHT ? 1 : 0);
 
 		// add the new value and partition that marks its end or start
 		forceListInsert(values, valuesInsertionPoint, fillForNewRange);
-		forceListInsert(partitions, valueRangeToShrink, new RangePartition<D>(splitPoint, toClose));
+		forceListInsert(partitions, valueRangeToShrink, toAdd);
 	}
 
 	/**
@@ -145,52 +146,5 @@ public class ContiguousRangeSet<D extends Comparable<D>, T> {
 
 	public void removeValueRange(int partitionIndex, Side rangeToDelete) {
 		// TODO
-	}
-
-	// ===================
-
-	private static class RangePartition<D extends Comparable<D>> implements Comparable<D> {
-		private final D position;
-		private Side closedSide;
-
-		public RangePartition(D position, Side closedSide) {
-			this.position = position;
-			this.closedSide = closedSide;
-		}
-
-		@Override
-		public int compareTo(D other) {
-			int positionDifference = position.compareTo(other);
-			if (positionDifference != 0) {
-				return positionDifference;
-			}
-
-			// if range above partition owns this pos, other belongs in it.
-			// otherwise belongs in range below this partition.
-			return -closedSide.index;
-		}
-
-		@SuppressWarnings("unused")
-		public D getPosition() {
-			return position;
-		}
-
-		@SuppressWarnings("unused")
-		public Side getClosedSide() {
-			return closedSide;
-		}
-
-		@Override
-		public String toString() {
-			return Objects.toStringHelper(this).add("pos", position).add("closed", closedSide)
-					.toString();
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			@SuppressWarnings("unchecked")
-			RangePartition<D> other = (RangePartition<D>) obj;
-			return position.equals(other.position);
-		}
 	}
 }
