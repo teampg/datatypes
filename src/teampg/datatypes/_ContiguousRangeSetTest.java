@@ -10,7 +10,7 @@ import com.google.common.collect.BoundType;
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 
-public class ContiguousRangeSetTest {
+public class _ContiguousRangeSetTest {
 	ContiguousRangeSet<Double, String> valRange;
 
 	@Before
