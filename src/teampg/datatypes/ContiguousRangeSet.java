@@ -6,19 +6,25 @@ import static com.google.common.base.Preconditions.checkElementIndex;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import com.google.common.base.Objects;
 import com.google.common.collect.Range;
 
 /**
  * Maps values to different segments of one contiguous range. Similar to a
- * gradient, but without the fading.
- * <br><pre><code>
+ * gradient, but without the fading. <br>
+ *
+ * <pre>
+ * <code>
  * Example<Integer, String>: <b>[</b> means left is inclusive, <b>)</b> means right is exclusive
  * [0..1) => "None"
  * [1..2) => "One"
  * [2..3) => "Several"
  * [3..10) => "Lots"
  * [10..infinity] => "Many"
- * </code></pre>
+ * </code>
+ * </pre>
+ *
  * @author Jackson Williams
  *
  * @param <D>
@@ -27,12 +33,12 @@ import com.google.common.collect.Range;
  *            Value associated with each different section of the range
  */
 public class ContiguousRangeSet<D extends Comparable<D>, T> {
-	private enum Direction {
-		UP(1), DOWN(-1);
+	public enum Side {
+		RIGHT(1), LEFT(-1);
 
 		private final int index;
 
-		Direction(int index) {
+		Side(int index) {
 			this.index = index;
 		}
 	};
@@ -66,20 +72,17 @@ public class ContiguousRangeSet<D extends Comparable<D>, T> {
 	// ==================
 
 	public T getValue(D atPos) {
-		int rangeIndex = getRangeIndex(atPos);
+		int rangeIndex = indexOfRangeOwningPosition(atPos);
 		T value = values.get(rangeIndex);
 
 		return value;
 	}
 
-	private int getRangeIndex(D atPos) {
+	private int indexOfRangeOwningPosition(D atPos) {
 		checkArgument(totalBounds.contains(atPos));
 
-		int correctInsertionPoint = Collections.binarySearch(partitions, atPos);
-		assert (correctInsertionPoint < 0); // partition compareTo never returns
-											// "equals" (0)
-
-		return -(correctInsertionPoint + 1);
+		int positionOfRangeOwningAtPos = -(Collections.binarySearch(partitions, atPos) + 1);
+		return positionOfRangeOwningAtPos;
 	}
 
 	// ==================
@@ -91,45 +94,56 @@ public class ContiguousRangeSet<D extends Comparable<D>, T> {
 		// TODO
 	}
 
+	public void moveValueRange(int index, int newIndex) {
+		// TODO
+		// NOTE should also swap dimensions (meaning partitions...)
+	}
+
 	// ==================
 
-	public void setPartitionType(int index, Direction boundToSetClosed) {
+	public void setPartitionType(int index, Side boundToSetClosed) {
 		checkElementIndex(index, partitions.size(), "Partition index out of bounds");
 		partitions.get(index).closedSide = boundToSetClosed;
 	}
 
 	// ==================
 
-	public void partitionAddAbove(D splitPoint, Direction boundToSetClosed, T fillForNewRange) {
-		partition(splitPoint, boundToSetClosed, fillForNewRange, Direction.UP);
-	}
-
-	public void partitionAddBelow(D splitPoint, Direction boundToSetClosed, T fillForNewRange) {
-		partition(splitPoint, boundToSetClosed, fillForNewRange, Direction.DOWN);
-	}
-
-	private void partition(D splitPoint, Direction boundToSetClosed, T fillForNewRange,
-			Direction positionForNewRange) {
+	public void addPartition(D splitPoint, Side toClose, T fillForNewRange, Side toOverwrite) {
 		checkArgument(totalBounds.contains(splitPoint), "Split point out of bounds " + totalBounds);
+		checkArgument(!partitions.contains(new RangePartition<D>(splitPoint, null)));
 
-		partitions.add(new RangePartition<D>(splitPoint, boundToSetClosed));
+		/*
+		 * FIXME throws error when you try to add partition at same pos as
+		 * another. Would be untested edge case in GUI.... be sure to remember
+		 * this when implementing gui component
+		 */
 
-		int rangeToShrink = getRangeIndex(splitPoint);
-		int insertionPoint = rangeToShrink + (positionForNewRange == Direction.UP ? 1 : 0);
-		values.add(insertionPoint, fillForNewRange);
+		int valueRangeToShrink = indexOfRangeOwningPosition(splitPoint);
+		int valuesInsertionPoint = valueRangeToShrink + (toOverwrite == Side.RIGHT ? 1 : 0);
+
+		// add the new value and partition that marks its end or start
+		forceListInsert(values, valuesInsertionPoint, fillForNewRange);
+		forceListInsert(partitions, valueRangeToShrink, new RangePartition<D>(splitPoint, toClose));
+	}
+
+	/**
+	 * Inserts some value into a list, or adds it if insertion index is at end
+	 * of list
+	 */
+	private <Q> void forceListInsert(List<Q> list, int index, Q toAdd) {
+		checkArgument(index < list.size() + 1);
+
+		if (index == list.size()) {
+			list.add(toAdd);
+			return;
+		}
+
+		list.add(index, toAdd);
 	}
 
 	// ===================
 
-	public void removePartitionDeleteRangeBelow(int partitionIndex) {
-		removeRange(partitionIndex, Direction.DOWN);
-	}
-
-	public void removePartitionDeleteRangeAbove(int partitionIndex) {
-		removeRange(partitionIndex, Direction.UP);
-	}
-
-	private void removeRange(int partitionIndex, Direction rangeToDelete) {
+	public void removeValueRange(int partitionIndex, Side rangeToDelete) {
 		// TODO
 	}
 
@@ -137,9 +151,9 @@ public class ContiguousRangeSet<D extends Comparable<D>, T> {
 
 	private static class RangePartition<D extends Comparable<D>> implements Comparable<D> {
 		private final D position;
-		private Direction closedSide;
+		private Side closedSide;
 
-		public RangePartition(D position, Direction closedSide) {
+		public RangePartition(D position, Side closedSide) {
 			this.position = position;
 			this.closedSide = closedSide;
 		}
@@ -162,8 +176,21 @@ public class ContiguousRangeSet<D extends Comparable<D>, T> {
 		}
 
 		@SuppressWarnings("unused")
-		public Direction getClosedSide() {
+		public Side getClosedSide() {
 			return closedSide;
+		}
+
+		@Override
+		public String toString() {
+			return Objects.toStringHelper(this).add("pos", position).add("closed", closedSide)
+					.toString();
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			@SuppressWarnings("unchecked")
+			RangePartition<D> other = (RangePartition<D>) obj;
+			return position.equals(other.position);
 		}
 	}
 }

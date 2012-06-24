@@ -1,44 +1,36 @@
 package teampg.datatypes;
 
 import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
 
+import teampg.datatypes.ContiguousRangeSet.Side;
+
+import com.google.common.collect.BoundType;
+import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 
 public class ContiguousRangeSetTest {
-	ContiguousRangeSet<Double, String> noPartitions;
+	ContiguousRangeSet<Double, String> valRange;
 
 	@Before
 	public void setUp() throws Exception {
-		noPartitions = new ContiguousRangeSet<>(Ranges.closed(-1D, 1D), "Only");
-
-
+		valRange = new ContiguousRangeSet<>(Ranges.closed(-1D, 1D), "Initial Fill");
 	}
 
 	@Test
 	public void testInit() {
-		System.out.println();
+		assertEquals(1, valRange.getValues().size());
+		assertEquals("Initial Fill", valRange.getValues().get(0));
 
-		assertEquals(1, noPartitions.getValues().size());
-		assertEquals("Only", noPartitions.getValues().get(0));
+		assertEquals(0, valRange.getPartitions().size());
 
-		assertEquals(0, noPartitions.getPartitions().size());
-
-		for (Double d = -1D; d.compareTo(1D) < 0; d+=0.001D) {
-			assertEquals("Only", noPartitions.getValue(d));
-		}
+		assertValues(valRange, Ranges.closed(-1D, 1D), "Initial Fill");
 	}
 
 	@Test
 	public void testGetBounds() {
-		assertEquals(Ranges.closed(-1D, 1D), noPartitions.getBounds());
-	}
-
-	@Test
-	public void testInvalidParameters() {
-		fail("Not yet implemented");
+		assertEquals(Ranges.closed(-1D, 1D), valRange.getBounds());
 	}
 
 	@Test
@@ -52,13 +44,21 @@ public class ContiguousRangeSetTest {
 	}
 
 	@Test
-	public void testPartitionAddAbove() {
-		fail("Not yet implemented");
-	}
+	public void testAddPartition() {
+		valRange.addPartition(0.0D, Side.LEFT, "Top", Side.RIGHT);
+		assertValues(valRange, Ranges.closed(-1D, 0D), "Initial Fill");
+		assertValues(valRange, Ranges.openClosed(0.0D, 1.0D), "Top");
 
-	@Test
-	public void testPartitionAddBelow() {
-		fail("Not yet implemented");
+		valRange.addPartition(0.5D, Side.RIGHT, "Middle", Side.LEFT);
+		assertValues(valRange, Ranges.closed(-1D, 0D), "Initial Fill");
+		assertValues(valRange, Ranges.open(0D, 0.5D), "Middle");
+		assertValues(valRange, Ranges.closed(0.5D, 1.0D), "Top");
+
+		valRange.addPartition(-0.5D, Side.RIGHT, "Bottom", Side.LEFT);
+		assertValues(valRange, Ranges.closedOpen(-1D, -0.5D), "Bottom");
+		assertValues(valRange, Ranges.closed(-0.5D, 0D), "Initial Fill");
+		assertValues(valRange, Ranges.open(0D, 0.5D), "Middle");
+		assertValues(valRange, Ranges.closed(0.5D, 1.0D), "Top");
 	}
 
 	@Test
@@ -71,4 +71,30 @@ public class ContiguousRangeSetTest {
 		fail("Not yet implemented");
 	}
 
+
+	static <T> void assertValues(ContiguousRangeSet<Double, T> valRange, Range<Double> in, T expected) {
+		assertValues(valRange, in, expected, 0.1D);
+	}
+
+	static <T> void assertValues(ContiguousRangeSet<Double, T> valRange, Range<Double> in, T expected, Double checkInterval) {
+		//check leftmost point
+		Double cursor = in.lowerEndpoint();
+		if (in.lowerBoundType().equals(BoundType.OPEN)) {
+			cursor += 0.0000000001D;
+		}
+
+		//check fill points
+		while (in.contains(cursor)) {
+			assertEquals(expected, valRange.getValue(cursor));
+			cursor += checkInterval;
+		}
+
+		// check rightmost point
+		cursor = in.upperEndpoint();
+		if (in.upperBoundType().equals(BoundType.OPEN)) {
+			cursor -= 0.0000000001D;
+		}
+		assertEquals(expected, valRange.getValue(cursor));
+
+	}
 }
