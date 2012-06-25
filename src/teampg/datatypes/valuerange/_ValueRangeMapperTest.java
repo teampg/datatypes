@@ -1,11 +1,11 @@
-package teampg.datatypes.ValueRangeMapper;
+package teampg.datatypes.valuerange;
 
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import teampg.datatypes.ValueRangeMapper.ValueRangeMapper.Side;
+import teampg.datatypes.valuerange.ValueRangeMapper.Side;
 
 import com.google.common.collect.BoundType;
 import com.google.common.collect.Lists;

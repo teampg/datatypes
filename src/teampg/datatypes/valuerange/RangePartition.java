@@ -1,6 +1,6 @@
-package teampg.datatypes.ValueRangeMapper;
+package teampg.datatypes.valuerange;
 
-import teampg.datatypes.ValueRangeMapper.ValueRangeMapper.Side;
+import teampg.datatypes.valuerange.ValueRangeMapper.Side;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Ranges;
