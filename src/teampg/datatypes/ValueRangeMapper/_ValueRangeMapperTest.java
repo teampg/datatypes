@@ -1,19 +1,19 @@
-package teampg.datatypes;
+package teampg.datatypes.ValueRangeMapper;
 
 import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import teampg.datatypes.ContiguousRangeSet.Side;
+import teampg.datatypes.ValueRangeMapper.ValueRangeMapper.Side;
 
 import com.google.common.collect.BoundType;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 
-public class _ContiguousRangeSetTest {
-	ContiguousRangeSet<Double, String> valRange;
+public class _ValueRangeMapperTest {
+	ValueRangeMapper<Double, String> valRange;
 
 	RangePartition<Double> leftPartition = RangePartition.of(-0.5D, Side.RIGHT);
 	RangePartition<Double> middlePartition = RangePartition.of(0.0D, Side.LEFT);
@@ -21,7 +21,7 @@ public class _ContiguousRangeSetTest {
 
 	@Before
 	public void setUp() throws Exception {
-		valRange = new ContiguousRangeSet<>(Ranges.closed(-1D, 1D), "Initial Fill");
+		valRange = new ValueRangeMapper<>(Ranges.closed(-1D, 1D), "Initial Fill");
 	}
 
 	@Test
@@ -89,12 +89,34 @@ public class _ContiguousRangeSetTest {
 		fail("Not yet implemented");
 	}
 
-	static <T> void assertValues(ContiguousRangeSet<Double, T> valRange, Range<Double> in,
+	@Test
+	public void testBuilder() {
+		testAddPartition();
+
+		ValueRangeMapper.Builder<Double, String> myBuilder =
+				new ValueRangeMapper.Builder<Double, String>(Ranges.closed(-1D, 1D), "Bottom")
+				.add(RangePartition.of(-0.5D, Side.RIGHT), "Initial Fill")
+				.add(RangePartition.of(0D, Side.LEFT), "Middle")
+				.add(RangePartition.of(0.5D, Side.RIGHT), "Top");
+		ValueRangeMapper<Double, String> sameAsValRange = myBuilder.build();
+
+		assertEquals(valRange.getBounds(), 		sameAsValRange.getBounds());
+		assertEquals(valRange.getPartitions(), 	sameAsValRange.getPartitions());
+		assertEquals(valRange.getValues(), 		sameAsValRange.getValues());
+
+		assertEquals(valRange, sameAsValRange);
+
+		//building multiple times returns different instances
+		assertEquals(sameAsValRange, myBuilder.build());
+		assertFalse(sameAsValRange == myBuilder.build());
+	}
+
+	static <T> void assertValues(ValueRangeMapper<Double, T> valRange, Range<Double> in,
 			T expected) {
 		assertValues(valRange, in, expected, 0.1D);
 	}
 
-	static <T> void assertValues(ContiguousRangeSet<Double, T> valRange, Range<Double> in,
+	static <T> void assertValues(ValueRangeMapper<Double, T> valRange, Range<Double> in,
 			T expected, Double checkInterval) {
 		// check leftmost point
 		Double cursor = in.lowerEndpoint();

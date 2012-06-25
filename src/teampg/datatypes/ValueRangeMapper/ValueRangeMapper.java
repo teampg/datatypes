@@ -1,4 +1,4 @@
-package teampg.datatypes;
+package teampg.datatypes.ValueRangeMapper;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkElementIndex;
@@ -6,6 +6,7 @@ import static com.google.common.base.Preconditions.checkElementIndex;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import com.google.common.collect.Range;
 
@@ -31,7 +32,7 @@ import com.google.common.collect.Range;
  * @param <T>
  *            Value associated with each different section of the range
  */
-public class ContiguousRangeSet<D extends Comparable<D>, T> {
+public class ValueRangeMapper<D extends Comparable<D>, T> {
 	public enum Side {
 		RIGHT, LEFT;
 	};
@@ -41,7 +42,7 @@ public class ContiguousRangeSet<D extends Comparable<D>, T> {
 	private final List<RangePartition<D>> partitions;
 	private final List<T> values;
 
-	public ContiguousRangeSet(Range<D> bounds, T initialValue) {
+	public ValueRangeMapper(Range<D> bounds, T initialValue) {
 		totalBounds = bounds;
 
 		partitions = new ArrayList<>();
@@ -147,4 +148,68 @@ public class ContiguousRangeSet<D extends Comparable<D>, T> {
 	public void removeValueRange(int partitionIndex, Side rangeToDelete) {
 		// TODO
 	}
+
+	// ===================
+
+	@Override
+	public boolean equals(Object obj) {
+		@SuppressWarnings("unchecked")
+		ValueRangeMapper<D, T> other = (ValueRangeMapper<D, T>) obj;
+
+		if (!totalBounds.equals(other.totalBounds)) {
+			return false;
+		}
+
+		if (!partitions.equals(other.partitions)) {
+			return false;
+		}
+
+		return values.equals(other.values);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(totalBounds, partitions, values);
+	}
+
+	// ===================
+
+	/**
+	 * Exposes fluent syntax for building an instance of the containing class for convenience.
+	 * <br />
+	 * Safe to reuse to build multiple instances.
+	 */
+	public static class Builder<D extends Comparable<D>, T> {
+		private final Range<D> bounds;
+		private final T lowestValue;
+
+		private final List<T> values;
+		private final List<RangePartition<D>> partitions;
+
+		public Builder(Range<D> bounds, T lowestValue) {
+			this.bounds = bounds;
+			this.lowestValue = lowestValue;
+
+			values = new ArrayList<>();
+			partitions = new ArrayList<>();
+		}
+
+		public Builder<D, T> add(RangePartition<D> floor, T value) {
+			partitions.add(floor);
+			values.add(value);
+
+			return this;
+		}
+
+		public ValueRangeMapper<D, T> build() {
+			ValueRangeMapper<D, T> inst = new ValueRangeMapper<>(bounds, lowestValue);
+
+			for(int i = 0; i < partitions.size(); i++) {
+				inst.addPartition(partitions.get(i), values.get(i), Side.RIGHT);
+			}
+
+			return inst;
+		}
+	}
+
 }
