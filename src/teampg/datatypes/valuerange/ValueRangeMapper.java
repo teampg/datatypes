@@ -145,7 +145,7 @@ public class ValueRangeMapper<D extends Comparable<D>, T> {
 
 	// ===================
 
-	public void removeValueRange(int partitionIndex, Side rangeToDelete) {
+	public void removePartition(int partitionIndex, Side valueToRemove) {
 		// TODO
 	}
 

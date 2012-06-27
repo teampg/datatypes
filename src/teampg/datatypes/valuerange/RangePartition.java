@@ -15,8 +15,8 @@ public class RangePartition<D extends Comparable<D>> implements Comparable<D> {
 	}
 
 	@Override
-	public int compareTo(D other) {
-		int positionDifference = position.compareTo(other);
+	public int compareTo(D somePosition) {
+		int positionDifference = position.compareTo(somePosition);
 		if (positionDifference != 0) {
 			return positionDifference;
 		}
