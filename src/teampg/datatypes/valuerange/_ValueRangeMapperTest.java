@@ -16,7 +16,14 @@ import com.google.common.collect.Range;
 import com.google.common.collect.Ranges;
 
 public class _ValueRangeMapperTest {
-	ValueRangeMapper<Double, String> valRange;
+
+	static final String BOTTOM = "Bottom";
+	static final String INIT = "Init";
+	static final String MIDDLE = "Middle";
+	static final String TOP = "Top";
+
+	ValueRangeMapper<Double, String> empty;
+	ValueRangeMapper<Double, String> filled;
 
 	RangePartition<Double> leftPartition = RangePartition.of(-0.5D, Side.RIGHT);
 	RangePartition<Double> middlePartition = RangePartition.of(0.0D, Side.LEFT);
@@ -24,57 +31,68 @@ public class _ValueRangeMapperTest {
 
 	@Before
 	public void setUp() throws Exception {
-		valRange = new ValueRangeMapper<>(Ranges.closed(-1D, 1D), "Initial Fill");
+		empty = new ValueRangeMapper<>(Ranges.closed(-1D, 1D), INIT);
+
+		filled = new ValueRangeMapper<>(Ranges.closed(-1D, 1D), INIT);
+		filled.addPartition(middlePartition, TOP, Side.RIGHT);
+		filled.addPartition(rightPartition, MIDDLE, Side.LEFT);
+		filled.addPartition(leftPartition, BOTTOM, Side.LEFT);
 	}
 
 	@Test
 	public void testInit() {
-		assertEquals(1, valRange.getValues().size());
-		assertEquals("Initial Fill", valRange.getValues().get(0));
+		ValueRangeMapper<Double, String> expectedEmpty = new ValueRangeMapper.Builder<>(
+				Ranges.closed(-1D, 1D), INIT)
+				.build();
+		assertEquals(expectedEmpty, empty);
+		assertValid(empty);
 
-		assertEquals(0, valRange.getPartitions().size());
 
-		validateValueRangeMapper(valRange);
-		//		assertValues(valRange, Ranges.closed(-1D, 1D), "Initial Fill");
+		ValueRangeMapper<Double, String> expectedFilled = new ValueRangeMapper.Builder<>(
+				Ranges.closed(-1D, 1D), BOTTOM)
+				.add(RangePartition.of(-0.5D, Side.RIGHT), INIT)
+				.add(RangePartition.of(0D, Side.LEFT), MIDDLE)
+				.add(RangePartition.of(0.5D, Side.RIGHT), TOP)
+		 		.build();
+		assertEquals(expectedFilled, filled);
+		assertValid(filled);
 	}
 
 	@Test
 	public void testGetBounds() {
-		assertEquals(Ranges.closed(-1D, 1D), valRange.getBounds());
+		assertEquals(Ranges.closed(-1D, 1D), empty.getBounds());
 	}
 
 	@Test
 	public void testMovePartitionSingle() {
-		testAddPartition();
 		// assumes testBuilder passes
 
-		valRange.movePartition(0, -0.4D);
+		filled.movePartition(0, -0.4D);
 
-		ValueRangeMapper<Double, String> expectedValRange = new ValueRangeMapper.Builder<Double, String>(
-				Ranges.closed(-1D, 1D), "Bottom")
-				.add(RangePartition.of(-0.4D, Side.RIGHT), "Initial Fill")
-				.add(RangePartition.of(0D, Side.LEFT), "Middle")
-				.add(RangePartition.of(0.5D, Side.RIGHT), "Top").build();
+		ValueRangeMapper<Double, String> expectedValRange = new ValueRangeMapper.Builder<>(
+				Ranges.closed(-1D, 1D), BOTTOM)
+				.add(RangePartition.of(-0.4D, Side.RIGHT), INIT)
+				.add(RangePartition.of(0D, Side.LEFT), MIDDLE)
+				.add(RangePartition.of(0.5D, Side.RIGHT), TOP).build();
 
-		assertEquals(expectedValRange, valRange);
+		assertEquals(expectedValRange, filled);
 	}
 
 	@Test
 	public void testMovePartitionMultiple() {
-		testAddPartition();
 		// assumes testBuilder passes
 
-		valRange.movePartition(0, -0.4D);
-		valRange.movePartition(1, 0.1D);
-		valRange.movePartition(2, 0.2D);
+		filled.movePartition(0, -0.4D);
+		filled.movePartition(1, 0.1D);
+		filled.movePartition(2, 0.2D);
 
-		ValueRangeMapper<Double, String> expectedValRange = new ValueRangeMapper.Builder<Double, String>(
-				Ranges.closed(-1D, 1D), "Bottom")
-				.add(RangePartition.of(-0.4D, Side.RIGHT), "Initial Fill")
-				.add(RangePartition.of(0.1D, Side.LEFT), "Middle")
-				.add(RangePartition.of(0.2D, Side.RIGHT), "Top").build();
+		ValueRangeMapper<Double, String> expectedValRange = new ValueRangeMapper.Builder<>(
+				Ranges.closed(-1D, 1D), BOTTOM)
+				.add(RangePartition.of(-0.4D, Side.RIGHT), INIT)
+				.add(RangePartition.of(0.1D, Side.LEFT), MIDDLE)
+				.add(RangePartition.of(0.2D, Side.RIGHT), TOP).build();
 
-		assertEquals(expectedValRange, valRange);
+		assertEquals(expectedValRange, filled);
 	}
 
 	@Test
@@ -89,105 +107,92 @@ public class _ValueRangeMapperTest {
 
 	@Test
 	public void testSetPartitionType() {
-		testAddPartition();
-
 		int partToTest = 0;
-		Double partPos = valRange.getPartitions().get(partToTest).getPosition();
+		Double partPos = filled.getPartitions().get(partToTest).getPosition();
 
-		// closed side is right, so pos of partition is owned by range to its right ("Initial Fill")
-		assertEquals("Initial Fill", valRange.getValue(partPos));
-		assertEquals(Side.RIGHT, valRange.getPartitions().get(partToTest).getClosedSide());
+		// closed side is right, so pos of partition is owned by range to its right (INIT)
+		assertEquals(INIT, filled.getValue(partPos));
+		assertEquals(Side.RIGHT, filled.getPartitions().get(partToTest).getClosedSide());
 
 		// changed closed side
-		valRange.setPartitionType(partToTest, Side.LEFT);
+		filled.setPartitionType(partToTest, Side.LEFT);
 
-		// partPos should now belong to range on left ("Bottom")
-		assertEquals("Bottom", valRange.getValue(partPos));
-		assertEquals(Side.LEFT, valRange.getPartitions().get(partToTest).getClosedSide());
+		// partPos should now belong to range on left (BOTTOM)
+		assertEquals(BOTTOM, filled.getValue(partPos));
+		assertEquals(Side.LEFT, filled.getPartitions().get(partToTest).getClosedSide());
 	}
 
 	@Test
 	public void testAddPartition() {
-		valRange.addPartition(middlePartition, "Top", Side.RIGHT);
-		validateValueRangeMapper(valRange);
+		empty.addPartition(middlePartition, TOP, Side.RIGHT);
+		assertValid(empty);
 
-		valRange.addPartition(rightPartition, "Middle", Side.LEFT);
-		validateValueRangeMapper(valRange);
+		empty.addPartition(rightPartition, MIDDLE, Side.LEFT);
+		assertValid(empty);
 
-		valRange.addPartition(leftPartition, "Bottom", Side.LEFT);
-		validateValueRangeMapper(valRange);
-	}
+		empty.addPartition(leftPartition, BOTTOM, Side.LEFT);
+		assertValid(empty);
 
-	@Test
-	public void testGetEmptyPartitionsValues() {
-		assertEquals(Lists.newArrayList("Initial Fill"), valRange.getValues());
-		assertEquals(Lists.newArrayList(), valRange.getPartitions());
+		fail("TODO make test more complete by checking with builder"); //TODO
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testGetManyPartitionsValues() {
-		testAddPartition();
+	public void testGetPartitionsValues() {
+		assertEquals(Lists.newArrayList(INIT), empty.getValues());
+		assertEquals(Lists.newArrayList(), empty.getPartitions());
 
-		assertEquals(Lists.newArrayList("Bottom", "Initial Fill", "Middle", "Top"),
-				valRange.getValues());
+		assertEquals(Lists.newArrayList(BOTTOM, INIT, MIDDLE, TOP),
+				filled.getValues());
 		assertEquals(Lists.newArrayList(leftPartition, middlePartition, rightPartition),
-				valRange.getPartitions());
+				filled.getPartitions());
 	}
 
 	@Test
-	public void testRemoveValueRangeRight() {
-		testAddPartition();
-
-		//remove Initial Fill value section, filling with "Bottom"
-		valRange.removePartition(0, Side.RIGHT);
+	public void testRemovePartitionRangeRight() {
+		//remove Initial Fill value section, filling with BOTTOM
+		filled.removePartition(0, Side.RIGHT);
 
 		ValueRangeMapper<Double, String> expected = new ValueRangeMapper.Builder<Double, String>(
-				Ranges.closed(-1D, 1D), "Bottom").add(RangePartition.of(0D, Side.LEFT), "Middle")
-				.add(RangePartition.of(0.5D, Side.RIGHT), "Top").build();
-		assertEquals(expected, valRange);
+				Ranges.closed(-1D, 1D), BOTTOM).add(RangePartition.of(0D, Side.LEFT), MIDDLE)
+				.add(RangePartition.of(0.5D, Side.RIGHT), TOP).build();
+		assertEquals(expected, filled);
 	}
 
 	@Test
-	public void testRemoveValueRangeLeft() {
-		testAddPartition();
-
-		//remove Bottom value section, filling with "Initial Fill"
-		valRange.removePartition(0, Side.LEFT);
+	public void testRemovePartitionRangeLeft() {
+		//remove Bottom value section, filling with INIT
+		filled.removePartition(0, Side.LEFT);
 
 		ValueRangeMapper<Double, String> expected = new ValueRangeMapper.Builder<Double, String>(
-				Ranges.closed(-1D, 1D), "Initial Fill")
-				.add(RangePartition.of(0D, Side.LEFT), "Middle")
-				.add(RangePartition.of(0.5D, Side.RIGHT), "Top").build();
-		assertEquals(expected, valRange);
+				Ranges.closed(-1D, 1D), INIT)
+				.add(RangePartition.of(0D, Side.LEFT), MIDDLE)
+				.add(RangePartition.of(0.5D, Side.RIGHT), TOP).build();
+		assertEquals(expected, filled);
 	}
 
 	@Test
-	public void testRemoveValueRangeTop() {
-		testAddPartition();
-
-		//remove Bottom value section, filling with "Initial Fill"
-		valRange.removePartition(2, Side.RIGHT);
+	public void testRemovePartitionRangeTop() {
+		//remove Bottom value section, filling with INIT
+		filled.removePartition(2, Side.RIGHT);
 
 		ValueRangeMapper<Double, String> expected = new ValueRangeMapper.Builder<Double, String>(
-				Ranges.closed(-1D, 1D), "Bottom")
-				.add(RangePartition.of(-0.5D, Side.RIGHT), "Initial Fill")
-				.add(RangePartition.of(0D, Side.LEFT), "Middle").build();
-		assertEquals(expected, valRange);
+				Ranges.closed(-1D, 1D), BOTTOM)
+				.add(RangePartition.of(-0.5D, Side.RIGHT), INIT)
+				.add(RangePartition.of(0D, Side.LEFT), MIDDLE).build();
+		assertEquals(expected, filled);
 	}
 
 	@Test
 	public void testBuilder() {
-		testAddPartition();
-
-		ValueRangeMapper.Builder<Double, String> myBuilder = new ValueRangeMapper.Builder<Double, String>(
-				Ranges.closed(-1D, 1D), "Bottom")
-				.add(RangePartition.of(-0.5D, Side.RIGHT), "Initial Fill")
-				.add(RangePartition.of(0D, Side.LEFT), "Middle")
-				.add(RangePartition.of(0.5D, Side.RIGHT), "Top");
+		ValueRangeMapper.Builder<Double, String> myBuilder = new ValueRangeMapper.Builder<>(
+				Ranges.closed(-1D, 1D), BOTTOM)
+				.add(RangePartition.of(-0.5D, Side.RIGHT), INIT)
+				.add(RangePartition.of(0D, Side.LEFT), MIDDLE)
+				.add(RangePartition.of(0.5D, Side.RIGHT), TOP);
 		ValueRangeMapper<Double, String> sameAsValRange = myBuilder.build();
 
-		assertEquals(valRange, sameAsValRange);
+		assertEquals(filled, sameAsValRange);
 
 		//building multiple times returns different instances
 		assertEquals(sameAsValRange, myBuilder.build());
@@ -207,11 +212,11 @@ public class _ValueRangeMapperTest {
 		fail("Not yet implemented");
 	}
 
-	static <T> void validateValueRangeMapper(ValueRangeMapper<Double, T> valRange) {
-		validateValueRangeMapper(valRange, 0.1D);
+	static <T> void assertValid(ValueRangeMapper<Double, T> valRange) {
+		assertValid(valRange, 0.1D);
 	}
 
-	static <T> void validateValueRangeMapper(ValueRangeMapper<Double, T> valRange,
+	static <T> void assertValid(ValueRangeMapper<Double, T> valRange,
 			Double checkInterval) {
 		List<Range<Double>> mapSegments = convertValueRangeMapperToRangeList(valRange);
 
