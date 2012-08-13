@@ -3,13 +3,12 @@ package teampg.grid2d;
 
 import java.awt.Dimension;
 
-import teampg.grid2d.point.BoundedPos;
+import teampg.grid2d.point.AbsPos;
 import teampg.grid2d.point.Pos2D;
 
 
-public interface GridInterface<T> extends Iterable<T> {
-	T get(BoundedPos at);
-	void set(BoundedPos at, T val);
+public interface GridInterface<T> extends ReadGrid<T>, Iterable<T> {
+	void set(AbsPos at, T val);
 
 	Dimension getSize();
 
@@ -18,13 +17,15 @@ public interface GridInterface<T> extends Iterable<T> {
 	Entry<T> get(T toFind);
 	boolean contains(T element);
 
-	boolean isInBounds(BoundedPos pos);
+	boolean isInBounds(AbsPos pos);
+
+	void fill(T filler);
 
 	public void toArray(T[] toFill);
 	public GridInterface<T> copy();
 
 	public static class Entry<E> {
-		private final BoundedPos pos;
+		private final AbsPos pos;
 		private final E contents;
 
 		@Override
@@ -32,12 +33,12 @@ public interface GridInterface<T> extends Iterable<T> {
 			return "Entry [in=" + pos + ", contents=" + contents + "]";
 		}
 
-		public Entry(BoundedPos pos, E contents) {
+		public Entry(AbsPos pos, E contents) {
 			this.pos = pos;
 			this.contents = contents;
 		}
 
-		public BoundedPos getPosition() {
+		public AbsPos getPosition() {
 			return pos;
 		}
 
@@ -62,7 +63,7 @@ public interface GridInterface<T> extends Iterable<T> {
 			return Pos2D.squareDistance(pos, other.pos);
 		}
 
-		public int distance(BoundedPos to) {
+		public int distance(AbsPos to) {
 			return Pos2D.squareDistance(pos, to);
 		}
 	}

@@ -9,7 +9,7 @@ import java.util.Iterator;
 import org.junit.Before;
 import org.junit.Test;
 
-import teampg.grid2d.point.BoundedPos;
+import teampg.grid2d.point.AbsPos;
 
 
 
@@ -21,20 +21,20 @@ public class _RectGridTest {
 	public void setUp() throws Exception {
 		grid = new RectGrid<Integer>(size);
 
-		grid.set(BoundedPos.of(0, 0, size), 00);
-		grid.set(BoundedPos.of(1, 0, size), 10);
-		grid.set(BoundedPos.of(2, 0, size), 20);
-		grid.set(BoundedPos.of(3, 0, size), 30);
+		grid.set(AbsPos.of(0, 0), 00);
+		grid.set(AbsPos.of(1, 0), 10);
+		grid.set(AbsPos.of(2, 0), 20);
+		grid.set(AbsPos.of(3, 0), 30);
 
-		grid.set(BoundedPos.of(0, 1, size), 01);
-		grid.set(BoundedPos.of(1, 1, size), 11);
-		grid.set(BoundedPos.of(2, 1, size), 21);
-		grid.set(BoundedPos.of(3, 1, size), 31);
+		grid.set(AbsPos.of(0, 1), 01);
+		grid.set(AbsPos.of(1, 1), 11);
+		grid.set(AbsPos.of(2, 1), 21);
+		grid.set(AbsPos.of(3, 1), 31);
 
-		grid.set(BoundedPos.of(0, 2, size), 02);
-		grid.set(BoundedPos.of(1, 2, size), 12);
-		grid.set(BoundedPos.of(2, 2, size), 22);
-		grid.set(BoundedPos.of(3, 2, size), 32);
+		grid.set(AbsPos.of(0, 2), 02);
+		grid.set(AbsPos.of(1, 2), 12);
+		grid.set(AbsPos.of(2, 2), 22);
+		grid.set(AbsPos.of(3, 2), 32);
 
 		/**
 		 * <pre>
@@ -50,7 +50,7 @@ public class _RectGridTest {
 	}
 
 	private void assertGetThrowsOutOfBounds(GridInterface<Integer> in,
-			BoundedPos from) {
+			AbsPos from) {
 		boolean threw = false;
 
 		try {
@@ -64,20 +64,20 @@ public class _RectGridTest {
 
 	@Test
 	public void testRectGrid() {
-		assertTrue(grid.get(BoundedPos.of(0, 0, size)) == 00);
-		assertTrue(grid.get(BoundedPos.of(1, 0, size)) == 10);
-		assertTrue(grid.get(BoundedPos.of(2, 0, size)) == 20);
-		assertTrue(grid.get(BoundedPos.of(3, 0, size)) == 30);
+		assertTrue(grid.get(AbsPos.of(0, 0)) == 00);
+		assertTrue(grid.get(AbsPos.of(1, 0)) == 10);
+		assertTrue(grid.get(AbsPos.of(2, 0)) == 20);
+		assertTrue(grid.get(AbsPos.of(3, 0)) == 30);
 
-		assertTrue(grid.get(BoundedPos.of(0, 1, size)) == 01);
-		assertTrue(grid.get(BoundedPos.of(1, 1, size)) == 11);
-		assertTrue(grid.get(BoundedPos.of(2, 1, size)) == 21);
-		assertTrue(grid.get(BoundedPos.of(3, 1, size)) == 31);
+		assertTrue(grid.get(AbsPos.of(0, 1)) == 01);
+		assertTrue(grid.get(AbsPos.of(1, 1)) == 11);
+		assertTrue(grid.get(AbsPos.of(2, 1)) == 21);
+		assertTrue(grid.get(AbsPos.of(3, 1)) == 31);
 
-		assertTrue(grid.get(BoundedPos.of(0, 2, size)) == 02);
-		assertTrue(grid.get(BoundedPos.of(1, 2, size)) == 12);
-		assertTrue(grid.get(BoundedPos.of(2, 2, size)) == 22);
-		assertTrue(grid.get(BoundedPos.of(3, 2, size)) == 32);
+		assertTrue(grid.get(AbsPos.of(0, 2)) == 02);
+		assertTrue(grid.get(AbsPos.of(1, 2)) == 12);
+		assertTrue(grid.get(AbsPos.of(2, 2)) == 22);
+		assertTrue(grid.get(AbsPos.of(3, 2)) == 32);
 	}
 
 	@Test
@@ -104,10 +104,10 @@ public class _RectGridTest {
 
 	@Test
 	public void testOutOfBounds() {
-		assertGetThrowsOutOfBounds(grid, BoundedPos.of(-1, 0, size));
-		assertGetThrowsOutOfBounds(grid, BoundedPos.of(0, -1, size));
-		assertGetThrowsOutOfBounds(grid, BoundedPos.of(4, 0, size));
-		assertGetThrowsOutOfBounds(grid, BoundedPos.of(0, 3, size));
+		assertGetThrowsOutOfBounds(grid, AbsPos.of(-1, 0));
+		assertGetThrowsOutOfBounds(grid, AbsPos.of(0, -1));
+		assertGetThrowsOutOfBounds(grid, AbsPos.of(4, 0));
+		assertGetThrowsOutOfBounds(grid, AbsPos.of(0, 3));
 	}
 
 	@Test
@@ -115,8 +115,8 @@ public class _RectGridTest {
 		for (int y = 0; y < 3; y++) {
 			for (int x = 0; x < 4; x++) {
 				Integer toFind = new Integer(x * 10 + y);
-				BoundedPos found = grid.get(toFind).getPosition();
-				BoundedPos expected = BoundedPos.of(x, y, size);
+				AbsPos found = grid.get(toFind).getPosition();
+				AbsPos expected = AbsPos.of(x, y);
 
 				System.out.println(toFind);
 				assertEquals(expected, found);
@@ -136,7 +136,7 @@ public class _RectGridTest {
 			for (int x = 0; x < 4; x++) {
 				actualEntry = iter.next();
 
-				BoundedPos expectedPosition = BoundedPos.of(x, y, size);
+				AbsPos expectedPosition = AbsPos.of(x, y);
 				Integer expectedValue = x * 10 + y;
 
 				assertEquals(expectedPosition, actualEntry.getPosition());

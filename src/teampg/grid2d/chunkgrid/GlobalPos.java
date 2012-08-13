@@ -3,7 +3,9 @@ package teampg.grid2d.chunkgrid;
 
 import java.awt.Dimension;
 
-import teampg.grid2d.point.BoundedPos;
+import com.google.common.base.Objects;
+
+import teampg.grid2d.point.AbsPos;
 import teampg.grid2d.point.Pos2D;
 
 
@@ -15,7 +17,7 @@ import teampg.grid2d.point.Pos2D;
  */
 public class GlobalPos extends Pos2D {
 	private final ChunkPos chunkPos;
-	private final BoundedPos innerPos;
+	private final AbsPos innerPos;
 	private final Dimension chunkSize;
 
 	private GlobalPos(int x, int y, Dimension inChunkSize) {
@@ -51,24 +53,28 @@ public class GlobalPos extends Pos2D {
 			innerY = y - (chunkY * chunkSize.height);
 		}
 
-		innerPos = BoundedPos.of(innerX, innerY, chunkSize);
+		innerPos = AbsPos.of(innerX, innerY);
 	}
 
-	private GlobalPos(ChunkPos chunkPos, BoundedPos innerPos) {
-		super((chunkPos.x * innerPos.getChunkSize().width) + innerPos.x,
-				(chunkPos.y * innerPos.getChunkSize().height) + innerPos.y);
+	private GlobalPos(ChunkPos chunkPos, AbsPos innerPos, Dimension chunkSize) {
+		super((chunkPos.x * chunkSize.width) + innerPos.x,
+				(chunkPos.y * chunkSize.height) + innerPos.y);
 
 		this.chunkPos = chunkPos;
 		this.innerPos = innerPos;
-		chunkSize = (Dimension)innerPos.getChunkSize().clone();
+		this.chunkSize = chunkSize;
 	}
 
 	public ChunkPos getChunkComponent() {
 		return chunkPos;
 	}
 
-	public BoundedPos getInnerComponent() {
+	public AbsPos getInnerComponent() {
 		return innerPos;
+	}
+
+	public Dimension getChunkSize() {
+		return (Dimension) chunkSize.clone();
 	}
 
 
@@ -86,19 +92,16 @@ public class GlobalPos extends Pos2D {
 		return new GlobalPos(x, y, chunkSize);
 	}
 
-	public static GlobalPos of(ChunkPos chunkPos, BoundedPos innerPos) {
-		return new GlobalPos(chunkPos, innerPos);
+	public static GlobalPos of(ChunkPos chunkPos, AbsPos innerPos, Dimension chunkSize) {
+		return new GlobalPos(chunkPos, innerPos, chunkSize);
 	}
 
 	@Override
 	public String toString() {
-		String ret = "global:" + super.toString();
-
-		ret += "\tchunk:";
-		ret += chunkPos;
-		ret += ", \tinner:";
-		ret += innerPos;
-
-		return ret;
+		return Objects.toStringHelper(this)
+				.add("Chunk", chunkPos)
+				.add("Inner", innerPos)
+				.add("ChunkSize", chunkSize)
+				.toString();
 	}
 }

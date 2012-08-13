@@ -2,7 +2,6 @@ package teampg.grid2d.point;
 
 import static org.junit.Assert.*;
 
-import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,28 +15,26 @@ import org.junit.Test;
 public class _Pos2DTest {
 	RelPos relA;
 	RelPos relB;
-	BoundedPos absA;
-	BoundedPos absB;
-
-	static final Dimension BOUNDS_DONT_MATTER = new Dimension(100, 1000);
+	AbsPos absA;
+	AbsPos absB;
 
 	@Before
 	public void setUp() throws Exception {
 		relA = RelPos.of(-2, 2);
 		relB = RelPos.of(4, 2);
-		absA = BoundedPos.of(4, 2, BOUNDS_DONT_MATTER);
-		absB = BoundedPos.of(3, 0, BOUNDS_DONT_MATTER);
+		absA = AbsPos.of(4, 2);
+		absB = AbsPos.of(3, 0);
 	}
 
 	@Test
 	public void testProxComp() {
-		BoundedPos goal = BoundedPos.of(0, 0, BOUNDS_DONT_MATTER);
-		BoundedPos a = BoundedPos.of(1, 0, BOUNDS_DONT_MATTER);
-		BoundedPos b = BoundedPos.of(0, 2, BOUNDS_DONT_MATTER);
-		BoundedPos c = BoundedPos.of(3, 0, BOUNDS_DONT_MATTER);
-		BoundedPos d = BoundedPos.of(2, 2, BOUNDS_DONT_MATTER);
+		AbsPos goal = AbsPos.of(0, 0);
+		AbsPos a = AbsPos.of(1, 0);
+		AbsPos b = AbsPos.of(0, 2);
+		AbsPos c = AbsPos.of(3, 0);
+		AbsPos d = AbsPos.of(2, 2);
 
-		List<BoundedPos> positions = new ArrayList<>();
+		List<AbsPos> positions = new ArrayList<>();
 		positions.add(b);
 		positions.add(a);
 		positions.add(c);

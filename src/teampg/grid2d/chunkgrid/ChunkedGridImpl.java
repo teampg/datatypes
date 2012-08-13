@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import teampg.grid2d.point.BoundedPos;
+import teampg.grid2d.point.AbsPos;
 import teampg.grid2d.point.Pos2D;
 
 import com.google.common.collect.ImmutableSet;
@@ -53,7 +53,7 @@ public class ChunkedGridImpl<T> implements ChunkedGrid<T> {
 
 		Chunk<T> chunkToGetFrom = getChunk(tileCoordsOnMap);
 
-		BoundedPos tileCoordsInChunk = tileCoordsOnMap.getInnerComponent();
+		AbsPos tileCoordsInChunk = tileCoordsOnMap.getInnerComponent();
 
 		T tileFound = chunkToGetFrom.get(tileCoordsInChunk);
 		return tileFound;

@@ -7,9 +7,7 @@ import java.awt.Dimension;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import teampg.grid2d.point.BoundedPos;
-
-
+import teampg.grid2d.point.AbsPos;
 
 import com.google.common.collect.Iterators;
 
@@ -25,8 +23,7 @@ public class RectGrid<T> implements GridInterface<T> {
 	}
 
 	@Override
-	public T get(BoundedPos at) {
-		checkArgument(at.getChunkSize().equals(size));
+	public T get(AbsPos at) {
 		if (!isInBounds(at)) {
 			throw new IndexOutOfBoundsException();
 		}
@@ -35,8 +32,7 @@ public class RectGrid<T> implements GridInterface<T> {
 	}
 
 	@Override
-	public void set(BoundedPos at, T val) {
-		checkArgument(at.getChunkSize().equals(size));
+	public void set(AbsPos at, T val) {
 		if (!isInBounds(at)) {
 			throw new IndexOutOfBoundsException();
 		}
@@ -74,7 +70,7 @@ public class RectGrid<T> implements GridInterface<T> {
 							y++;
 						}
 
-						return new Entry<T>(BoundedPos.of(x, y, size), iter.next());
+						return new Entry<T>(AbsPos.of(x, y), iter.next());
 					}
 
 					@Override
@@ -87,9 +83,7 @@ public class RectGrid<T> implements GridInterface<T> {
 	}
 
 	@Override
-	public boolean isInBounds(BoundedPos pos) {
-		checkArgument(pos.getChunkSize().equals(size));
-
+	public boolean isInBounds(AbsPos pos) {
 		int x = pos.x;
 		int y = pos.y;
 
@@ -120,7 +114,7 @@ public class RectGrid<T> implements GridInterface<T> {
 				int x = i % size.width;
 				int y = i / size.width;
 
-				return new Entry<T>(BoundedPos.of(x, y, size), anElement);
+				return new Entry<T>(AbsPos.of(x, y), anElement);
 			}
 		}
 
@@ -166,5 +160,27 @@ public class RectGrid<T> implements GridInterface<T> {
 	@Override
 	public Dimension getSize() {
 		return (Dimension) size.clone();
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder ret = new StringBuilder(this.getClass().getSimpleName() + "{\n");
+
+		int i = 0;
+		for (int y = 0; y < size.height; y++) {
+			for (int x = 0; x < size.width; x++) {
+				ret.append(contents[i] + ((x==size.width-1)?"\n":", "));
+				i++;
+			}
+		}
+
+		return ret.toString() + "\n}";
+	}
+
+	@Override
+	public void fill(T filler) {
+		for (int i = 0; i < contents.length; i++) {
+			contents[i] = filler;
+		}
 	}
 }

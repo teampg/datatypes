@@ -9,7 +9,7 @@ import java.util.Arrays;
 import org.junit.Before;
 import org.junit.Test;
 
-import teampg.grid2d.point.BoundedPos;
+import teampg.grid2d.point.AbsPos;
 
 
 public class _SimpleChunkTest {
@@ -24,21 +24,21 @@ public class _SimpleChunkTest {
 		c = new SimpleChunk<>(CHUNK_SIZE);
 		for (int y = 0; y < CHUNK_SIZE.width; y++) {
 			for (int x = 0; x < CHUNK_SIZE.height; x++) {
-				c.set(BoundedPos.of(x, y, CHUNK_SIZE), y * CHUNK_SIZE.height + x);
+				c.set(AbsPos.of(x, y), y * CHUNK_SIZE.height + x);
 			}
 		}
 
 		sameAsC = new SimpleChunk<>(CHUNK_SIZE);
 		for (int y = 0; y < CHUNK_SIZE.width; y++) {
 			for (int x = 0; x < CHUNK_SIZE.height; x++) {
-				sameAsC.set(BoundedPos.of(x, y, CHUNK_SIZE), y * CHUNK_SIZE.height + x);
+				sameAsC.set(AbsPos.of(x, y), y * CHUNK_SIZE.height + x);
 			}
 		}
 
 		q = new SimpleChunk<>(CHUNK_SIZE);
 		for (int y = 0; y < CHUNK_SIZE.width; y++) {
 			for (int x = 0; x < CHUNK_SIZE.height; x++) {
-				q.set(BoundedPos.of(x, y, CHUNK_SIZE), 6413);
+				q.set(AbsPos.of(x, y), 6413);
 			}
 		}
 	}

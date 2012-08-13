@@ -5,8 +5,9 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Objects;
 import java.util.Set;
+
+import com.google.common.base.Objects;
 
 public abstract class Pos2D {
 	public static enum Axis {X, Y};
@@ -57,12 +58,15 @@ public abstract class Pos2D {
 
 	@Override
 	public String toString() {
-		return "Pos2D [x=" + x + ", y=" + y + "]";
+		return Objects.toStringHelper(this)
+				.add("x", x)
+				.add("y", y)
+				.toString();
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(x, y);
+		return Objects.hashCode(x, y);
 	}
 
 	//============================//
@@ -269,5 +273,11 @@ public abstract class Pos2D {
 	 */
 	public static boolean isWithinDimensions(Pos2D toTest, Dimension size) {
 		return isInRectBounds(0, size.width - 1, size.height - 1, 0, toTest);
+	}
+
+	public static double diagDistance(AbsPos origin, AbsPos destination) {
+		return Math.hypot(
+				destination.x - origin.x,
+				destination.y - origin.y);
 	}
 }

@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import teampg.grid2d.GridInterface;
 import teampg.grid2d.GridInterface.Entry;
-import teampg.grid2d.point.BoundedPos;
+import teampg.grid2d.point.AbsPos;
 
 import com.google.common.collect.Iterators;
 
@@ -118,10 +118,10 @@ public class _ChunkedGridImplTest {
 	@Test
 	public void testGlobalPositionIsSameAsLocalPlusChunk() {
 		// inside leftOfLeft, at 3,2. leftOfLeft is at -2,0.
-		BoundedPos localPosition = BoundedPos.of(2, 2, CHUNK_SIZE);
+		AbsPos localPosition = AbsPos.of(2, 2);
 		ChunkPos leftOfLeftPos = ChunkPos.of(-2, 0);
 
-		GlobalPos globalPosition = GlobalPos.of(leftOfLeftPos, localPosition);
+		GlobalPos globalPosition = GlobalPos.of(leftOfLeftPos, localPosition, CHUNK_SIZE);
 
 		// getting by global position returns exactly the same object as getting
 		// by local position
@@ -134,9 +134,9 @@ public class _ChunkedGridImplTest {
 			ChunkPos chunkPos = chunkEntry.getPosition();
 
 			for (Entry<String> entry : grid.get(chunkPos).getEntries()) {
-				BoundedPos innerPos = entry.getPosition();
+				AbsPos innerPos = entry.getPosition();
 
-				GlobalPos globalPosition = GlobalPos.of(chunkPos, innerPos);
+				GlobalPos globalPosition = GlobalPos.of(chunkPos, innerPos, CHUNK_SIZE);
 
 				assertTrue(entry.getContents() == grid.get(globalPosition));
 			}
@@ -145,7 +145,7 @@ public class _ChunkedGridImplTest {
 
 	@Test
 	public void testSet() {
-		GlobalPos globalPos = GlobalPos.of(ChunkPos.of(-1, 0), BoundedPos.of(0, 1, CHUNK_SIZE));
+		GlobalPos globalPos = GlobalPos.of(ChunkPos.of(-1, 0), AbsPos.of(0, 1), CHUNK_SIZE);
 		assertEquals("c[-1, 0], i[0, 1]", grid.get(globalPos));
 
 		grid.set(globalPos, "Bob");
@@ -154,14 +154,14 @@ public class _ChunkedGridImplTest {
 
 	@Test
 	public void testGet(){
-		GlobalPos globalPos = GlobalPos.of(ChunkPos.of(-1, 0), BoundedPos.of(0, 1, CHUNK_SIZE));
+		GlobalPos globalPos = GlobalPos.of(ChunkPos.of(-1, 0), AbsPos.of(0, 1), CHUNK_SIZE);
 		assertEquals("c[-1, 0], i[0, 1]", grid.get(globalPos));
 
 	}
 
 	@Test
 	public void testSetOutOfBounds() {
-		GlobalPos globalPos = GlobalPos.of(ChunkPos.of(-1, -1), BoundedPos.of(0, 1, CHUNK_SIZE));
+		GlobalPos globalPos = GlobalPos.of(ChunkPos.of(-1, -1), AbsPos.of(0, 1), CHUNK_SIZE);
 
 		try {
 			grid.set(globalPos, "Bob");
@@ -172,17 +172,17 @@ public class _ChunkedGridImplTest {
 
 	@Test
 	public void testIsInBoundsGlobalPos() {
-		GlobalPos inBounds = GlobalPos.of(ChunkPos.of(0, 1), BoundedPos.of(0, 1, CHUNK_SIZE));
+		GlobalPos inBounds = GlobalPos.of(ChunkPos.of(0, 1), AbsPos.of(0, 1), CHUNK_SIZE);
 		System.out.println(inBounds);
 		assertEquals(true, grid.contains(inBounds));
 
 		assertEquals(true, grid.contains(GlobalPos.of(0, 0, CHUNK_SIZE)));
 
 
-		GlobalPos reallyOutOfBounds = GlobalPos.of(ChunkPos.of(-100, -100), BoundedPos.of(0, 1, CHUNK_SIZE));
+		GlobalPos reallyOutOfBounds = GlobalPos.of(ChunkPos.of(-100, -100), AbsPos.of(0, 1), CHUNK_SIZE);
 		assertEquals(false, grid.contains(reallyOutOfBounds));
 
-		GlobalPos outOfBounds = GlobalPos.of(ChunkPos.of(-1, -1), BoundedPos.of(0, 1, CHUNK_SIZE));
+		GlobalPos outOfBounds = GlobalPos.of(ChunkPos.of(-1, -1), AbsPos.of(0, 1), CHUNK_SIZE);
 		assertEquals(false, grid.contains(outOfBounds));
 
 		ChunkedGrid<String> emptyGrid = new ChunkedGridImpl<>(new Dimension(3,3));
@@ -198,10 +198,10 @@ public class _ChunkedGridImplTest {
 			assertEquals(true, grid.contains(chunkPos));
 
 			for (Entry<String> entry : grid.get(chunkPos).getEntries()) {
-				BoundedPos innerPos = entry.getPosition();
+				AbsPos innerPos = entry.getPosition();
 
 				// cell is in grid
-				GlobalPos globalPosition = GlobalPos.of(chunkPos, innerPos);
+				GlobalPos globalPosition = GlobalPos.of(chunkPos, innerPos, CHUNK_SIZE);
 				assertEquals(true, grid.contains(globalPosition));
 			}
 		}
@@ -387,7 +387,7 @@ public class _ChunkedGridImplTest {
 		SimpleChunk<String> ret = new SimpleChunk<>(chunkSize);
 
 		for (GridInterface.Entry<String> e : ret.getEntries()) {
-			BoundedPos innerPos = e.getPosition();
+			AbsPos innerPos = e.getPosition();
 
 			ret.set(innerPos,
 					"c[" + chunkPos.x + ", " + chunkPos.y + "], " + "i[" + innerPos.x + ", "
