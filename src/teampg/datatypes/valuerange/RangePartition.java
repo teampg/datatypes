@@ -3,7 +3,7 @@ package teampg.datatypes.valuerange;
 import teampg.datatypes.valuerange.ValueRangeMapper.Side;
 
 import com.google.common.base.Objects;
-import com.google.common.collect.Ranges;
+import com.google.common.collect.Range;
 
 public class RangePartition<D extends Comparable<D>> implements Comparable<D> {
 	private final D position;
@@ -56,7 +56,7 @@ public class RangePartition<D extends Comparable<D>> implements Comparable<D> {
 
 	public static <D extends Comparable<D>> RangePartition<D> of(D position, Side closedSide) {
 		// check D is valid range type
-		Ranges.singleton(position);
+		Range.singleton(position);
 
 		return new RangePartition<D>(position, closedSide);
 	}
