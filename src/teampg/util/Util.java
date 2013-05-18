@@ -6,6 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import com.google.common.collect.ContiguousSet;
+import com.google.common.collect.DiscreteDomain;
+import com.google.common.collect.Range;
+
 public class Util {
 	private static Random rand = new Random();
 
@@ -45,5 +49,19 @@ public class Util {
 			T toAdd = iter.next();
 			addEachBranchAndLeaf(ret, toAdd);
 		}
+	}
+
+	public static <D extends Comparable<D>> D bounded(Range<D> range, DiscreteDomain<D> domain, D toCoerce) {
+		if (range.contains(toCoerce)) {
+			return toCoerce;
+		}
+
+		ContiguousSet<D> domainValues = ContiguousSet.create(range, domain);
+
+		if (toCoerce.compareTo(domainValues.first()) < 0) {
+			return domainValues.first();
+		}
+
+		return domainValues.last();
 	}
 }
