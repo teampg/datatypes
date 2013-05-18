@@ -1,23 +1,17 @@
 package teampg.grid2d;
 
 
-import java.awt.Dimension;
-
 import teampg.grid2d.point.AbsPos;
 import teampg.grid2d.point.Pos2D;
 
 
-public interface GridInterface<T> extends ReadGrid<T>, Iterable<T> {
+public interface GridInterface<T> extends ReadGrid<T> {
 	void set(AbsPos at, T val);
-
-	Dimension getSize();
 
 	Iterable<Entry<T>> getEntries();
 
 	Entry<T> get(T toFind);
 	boolean contains(T element);
-
-	boolean isInBounds(AbsPos pos);
 
 	void fill(T filler);
 

@@ -1,6 +1,7 @@
 package teampg.grid2d;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 
 import java.awt.Dimension;
@@ -123,7 +124,13 @@ public class RectGrid<T> implements GridInterface<T> {
 
 	@Override
 	public boolean contains(T toFind) {
+		checkNotNull(toFind);
+
 		for (T anElement : contents) {
+			if (anElement == null) {
+				continue;
+			}
+
 			if (toFind.equals(anElement)) {
 				return true;
 			}

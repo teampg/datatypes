@@ -1,5 +1,7 @@
 package teampg.grid2d.point;
 
+import java.util.Comparator;
+
 public final class RelPos extends Pos2D {
 	public static final RelPos ZERO       = new RelPos( 0,  0);
 	public static final RelPos UP         = new RelPos( 0, -1);
@@ -13,6 +15,34 @@ public final class RelPos extends Pos2D {
 
 	private RelPos(int inX, int inY) {
 		super(inX, inY);
+	}
+
+	/**
+	 * Smaller magnitude is better (smaller)
+	 */
+	public static Comparator<RelPos> byMagnitude() {
+		return new Comparator<RelPos>() {
+			@Override
+			public int compare(RelPos a, RelPos b) {
+				double magA = Pos2D.magnitude(a);
+				double magB = Pos2D.magnitude(b);
+				return Double.compare(magA, magB);
+			}
+		};
+	}
+
+	public int squareMagnitude() {
+		return Math.abs(x) + Math.abs(y);
+	}
+
+	//TODO test
+	public RelPos unitVector() {
+		float hypot = (float) Math.hypot(x, y);
+
+		float unitX = x/hypot;
+		float unitY = y/hypot;
+
+		return new RelPos(Math.round(unitX), Math.round(unitY));
 	}
 
 	@SuppressWarnings("unchecked")

@@ -13,7 +13,6 @@ import teampg.datatypes.valuerange.ValueRangeMapper.Side;
 import com.google.common.collect.BoundType;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
-import com.google.common.collect.Ranges;
 
 public class _ValueRangeMapperTest {
 
@@ -31,9 +30,9 @@ public class _ValueRangeMapperTest {
 
 	@Before
 	public void setUp() throws Exception {
-		empty = new ValueRangeMapper<>(Ranges.closed(-1D, 1D), INIT);
+		empty = new ValueRangeMapper<>(Range.closed(-1D, 1D), INIT);
 
-		filled = new ValueRangeMapper<>(Ranges.closed(-1D, 1D), INIT);
+		filled = new ValueRangeMapper<>(Range.closed(-1D, 1D), INIT);
 		filled.addPartition(middlePartition, TOP, Side.RIGHT);
 		filled.addPartition(rightPartition, MIDDLE, Side.LEFT);
 		filled.addPartition(leftPartition, BOTTOM, Side.LEFT);
@@ -42,14 +41,14 @@ public class _ValueRangeMapperTest {
 	@Test
 	public void testInit() {
 		ValueRangeMapper<Double, String> expectedEmpty = new ValueRangeMapper.Builder<>(
-				Ranges.closed(-1D, 1D), INIT)
+				Range.closed(-1D, 1D), INIT)
 				.build();
 		assertEquals(expectedEmpty, empty);
 		assertValid(empty);
 
 
 		ValueRangeMapper<Double, String> expectedFilled = new ValueRangeMapper.Builder<>(
-				Ranges.closed(-1D, 1D), BOTTOM)
+				Range.closed(-1D, 1D), BOTTOM)
 				.add(RangePartition.of(-0.5D, Side.RIGHT), INIT)
 				.add(RangePartition.of(0D, Side.LEFT), MIDDLE)
 				.add(RangePartition.of(0.5D, Side.RIGHT), TOP)
@@ -60,7 +59,7 @@ public class _ValueRangeMapperTest {
 
 	@Test
 	public void testGetBounds() {
-		assertEquals(Ranges.closed(-1D, 1D), empty.getBounds());
+		assertEquals(Range.closed(-1D, 1D), empty.getBounds());
 	}
 
 	@Test
@@ -70,7 +69,7 @@ public class _ValueRangeMapperTest {
 		filled.movePartition(0, -0.4D);
 
 		ValueRangeMapper<Double, String> expectedValRange = new ValueRangeMapper.Builder<>(
-				Ranges.closed(-1D, 1D), BOTTOM)
+				Range.closed(-1D, 1D), BOTTOM)
 				.add(RangePartition.of(-0.4D, Side.RIGHT), INIT)
 				.add(RangePartition.of(0D, Side.LEFT), MIDDLE)
 				.add(RangePartition.of(0.5D, Side.RIGHT), TOP).build();
@@ -87,7 +86,7 @@ public class _ValueRangeMapperTest {
 		filled.movePartition(2, 0.2D);
 
 		ValueRangeMapper<Double, String> expectedValRange = new ValueRangeMapper.Builder<>(
-				Ranges.closed(-1D, 1D), BOTTOM)
+				Range.closed(-1D, 1D), BOTTOM)
 				.add(RangePartition.of(-0.4D, Side.RIGHT), INIT)
 				.add(RangePartition.of(0.1D, Side.LEFT), MIDDLE)
 				.add(RangePartition.of(0.2D, Side.RIGHT), TOP).build();
@@ -154,7 +153,7 @@ public class _ValueRangeMapperTest {
 		filled.removePartition(0, Side.RIGHT);
 
 		ValueRangeMapper<Double, String> expected = new ValueRangeMapper.Builder<Double, String>(
-				Ranges.closed(-1D, 1D), BOTTOM).add(RangePartition.of(0D, Side.LEFT), MIDDLE)
+				Range.closed(-1D, 1D), BOTTOM).add(RangePartition.of(0D, Side.LEFT), MIDDLE)
 				.add(RangePartition.of(0.5D, Side.RIGHT), TOP).build();
 		assertEquals(expected, filled);
 	}
@@ -165,7 +164,7 @@ public class _ValueRangeMapperTest {
 		filled.removePartition(0, Side.LEFT);
 
 		ValueRangeMapper<Double, String> expected = new ValueRangeMapper.Builder<Double, String>(
-				Ranges.closed(-1D, 1D), INIT)
+				Range.closed(-1D, 1D), INIT)
 				.add(RangePartition.of(0D, Side.LEFT), MIDDLE)
 				.add(RangePartition.of(0.5D, Side.RIGHT), TOP).build();
 		assertEquals(expected, filled);
@@ -177,7 +176,7 @@ public class _ValueRangeMapperTest {
 		filled.removePartition(2, Side.RIGHT);
 
 		ValueRangeMapper<Double, String> expected = new ValueRangeMapper.Builder<Double, String>(
-				Ranges.closed(-1D, 1D), BOTTOM)
+				Range.closed(-1D, 1D), BOTTOM)
 				.add(RangePartition.of(-0.5D, Side.RIGHT), INIT)
 				.add(RangePartition.of(0D, Side.LEFT), MIDDLE).build();
 		assertEquals(expected, filled);
@@ -186,7 +185,7 @@ public class _ValueRangeMapperTest {
 	@Test
 	public void testBuilder() {
 		ValueRangeMapper.Builder<Double, String> myBuilder = new ValueRangeMapper.Builder<>(
-				Ranges.closed(-1D, 1D), BOTTOM)
+				Range.closed(-1D, 1D), BOTTOM)
 				.add(RangePartition.of(-0.5D, Side.RIGHT), INIT)
 				.add(RangePartition.of(0D, Side.LEFT), MIDDLE)
 				.add(RangePartition.of(0.5D, Side.RIGHT), TOP);
@@ -256,7 +255,7 @@ public class _ValueRangeMapperTest {
 						: BoundType.OPEN;
 			}
 
-			ret.add(Ranges.range(floor, floorType, ceiling, ceilingType));
+			ret.add(Range.range(floor, floorType, ceiling, ceilingType));
 		}
 
 		return ret;

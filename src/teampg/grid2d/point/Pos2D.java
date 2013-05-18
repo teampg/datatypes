@@ -31,6 +31,11 @@ public abstract class Pos2D {
 		}
 	}
 
+	public int[] toArray() {
+		int[] ret = {x, y};
+		return ret;
+	}
+
 	@Override
 	public boolean equals(Object what) {
 		if (this == what) {
@@ -74,7 +79,7 @@ public abstract class Pos2D {
 	//============================//
 
 	/**
-	 * A is bigger than B if it's closer to goal.
+	 * A is smaller (better) than B if it's closer to goal.
 	 */
 	public static class DistanceComparator implements Comparator<Pos2D> {
 		private final Pos2D goal;
