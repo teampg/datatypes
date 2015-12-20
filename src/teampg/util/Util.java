@@ -25,6 +25,8 @@ public class Util {
 		return options.get(rand.nextInt(options.size()));
 	}
 
+	public static int ensureRange(int value, int min, int max) { return Math.min(Math.max(value, min), max); }
+	
 	@SuppressWarnings("rawtypes")
 	private static Map<Class<Enum>, Enum[]> enumValues = new HashMap<>();
 	@SuppressWarnings({ "rawtypes", "unchecked" })
