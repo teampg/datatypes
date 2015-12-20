@@ -27,6 +27,7 @@ public class BitStr implements BitStrInterface {
 	 */
 	public BitStr(int length) {
 		checkArgument(length > 0);
+		checkArgument(length <= 32, "Bit String cannot be greater than 32");
 		this.length = length;
 		bits = 0;
 	}

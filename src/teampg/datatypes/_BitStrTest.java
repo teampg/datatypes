@@ -6,6 +6,8 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import jdk.nashorn.internal.runtime.ArgumentSetter;
+
 
 
 
@@ -334,6 +336,23 @@ public class _BitStrTest {
 		assertTrue(bitStrHasValue(bigBS, 0b11011111111010101010, bigLen));
 
 	}
+	
+	@Test
+	// current limitation - 32 bits.. Increase if needed
+	public void testLengthUpperLimit() {
+		boolean threwRightException = false;
+
+		BitStrInterface bstBiggestPossible = new BitStr(32);
+		try {
+			@SuppressWarnings("unused")
+			BitStrInterface bstTooLarge = new BitStr(33);
+		} catch (IllegalArgumentException e) {
+			threwRightException = true;
+		}
+
+		assertTrue(threwRightException);
+	}
+	
 
 
 	/*-**************
